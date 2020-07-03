@@ -1,0 +1,7 @@
+{
+  "name": "AutomaticAutomaton",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}

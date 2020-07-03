@@ -1,0 +1,18 @@
+/* body{justify-content: center;background: #f2f6f8;} */
+.img{position:absolute;z-index:1;}
+
+.container{
+    /* display:inline-block; */
+    /* width:640px; 
+    height:480px; */
+    /* margin: 0 auto;  */
+    /* background: black;  */
+    overflow: auto;
+    position:relative; 
+
+}
+
+#canvas{
+    position:relative;
+    z-index:20;
+}
