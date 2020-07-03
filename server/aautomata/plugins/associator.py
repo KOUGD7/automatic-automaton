@@ -1,4 +1,4 @@
-from core.model.associator import Associator
+from aautomata.core.model.associator import Associator
 
 
 class BaseStateAssociator(Associator):

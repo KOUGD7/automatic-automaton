@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 from numpy import ndarray
 
-from core.model.preprocessor import Preprocessor
+from aautomata.core.model.preprocessor import Preprocessor
 
 
 class BasePreprocessor(Preprocessor):
