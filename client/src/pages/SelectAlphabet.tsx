@@ -40,6 +40,13 @@ interface RecAttributes {
 	stroke: string;
 }
 
+interface RectCoords {
+	topR: {x: Number, y: Number};
+	topL: {x: Number, y: Number};
+	bottomR: {x: Number, y: Number};
+	bottomL: {x: Number, y: Number};
+}
+
 const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	const { photo } = props.location.state as RouterLocationState;
 	const [image, setImage] = useState(new window.Image());
@@ -51,6 +58,13 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 		height: 100,
 		stroke: 'red',
 	});
+	const [recCoords, setCoords] = useState<RectCoords>({
+		topR: {x: rec.x, y: rec.y},
+		topL: {x: rec.x+rec.width, y: rec.y},
+		bottomR: {x: rec.x, y: rec.y+rec.height},
+		bottomL: {x: rec.x+rec.width, y: rec.y+rec.height}
+	});
+
 	const { startUpload } = usePhotoUpload();
 
 	useEffect(() => {
@@ -135,6 +149,12 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
 			let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
 			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+			setCoords({
+				topR: {x: x, y: y},
+				topL: {x: x+rw, y: y},
+				bottomR: {x: x, y: y+rh},
+				bottomL: {x: x+rw, y: y+rh}
+			});
 
 			layer.batchDraw();
 		}
@@ -183,6 +203,12 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
 			let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
 			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+			setCoords({
+				topR: {x: x, y: y},
+				topL: {x: x+rw, y: y},
+				bottomR: {x: x, y: y+rh},
+				bottomL: {x: x+rw, y: y+rh}
+			});
 
 			layer.batchDraw();
 		}
