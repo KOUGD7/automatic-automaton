@@ -34,7 +34,7 @@ async def preprocess_image(image: UploadFile = File(...)):
         if not mime_type == 'jpeg' and not mime_type == 'png':
             raise(Exception('FileFormatError: Uploaded file is not a JPEG or PNG.'))
 
-        path_to_img = os.path.join('uploads', image.filename)
+        path_to_img = os.path.join('aautomata/uploads', image.filename)
 
         save_file(path_to_img, image.file)
 

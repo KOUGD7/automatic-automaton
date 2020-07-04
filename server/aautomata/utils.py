@@ -1,4 +1,5 @@
 import os
+import math
 import shutil
 import cv2 as cv
 from fastapi import File
@@ -53,3 +54,16 @@ def resize(img, to_size: int):
 
     resized = cv.resize(img, new_dimensions, interpolation=cv.INTER_AREA)
     return resized
+
+
+def midpoint(a, b):
+    """Calculate the midpoint between two points a and b."""
+    return ((a[0] + b[0]) * 0.5, (a[1] + b[1]) * 0.5)
+
+
+def distance(a, b):
+    """Calculate the euclidean distance between two points a and b."""
+
+    x1, y1 = a
+    x2, y2 = b
+    return math.sqrt(((x2 - x1) ** 2) + ((y2 - y1) ** 2))
