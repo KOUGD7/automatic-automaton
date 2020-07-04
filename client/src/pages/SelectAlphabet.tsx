@@ -176,9 +176,9 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			console.log('transform start');
 		});
 
-		rect.on('dragmove', function () {
-			updateRect();
-		});
+		// rect.on('dragmove', function () {
+		// 	updateRect();
+		// });
 
 		rect.on('transform', function () {
 			updateRect();
@@ -214,6 +214,21 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 		}
 	};
 
+	const handleDragMove = (evt: KonvaEventObject<DragEvent>) => {
+		let rect = evt.currentTarget;
+		let x = rect.x();
+		let y = rect.y();
+		let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
+		let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
+		setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+		setCoords({
+			topR: {x: x, y: y},
+			topL: {x: x+rw, y: y},
+			bottomR: {x: x, y: y+rh},
+			bottomL: {x: x+rw, y: y+rh}
+		});
+	};
+
 	return (
 		<IonPage>
 			<IonHeader>
@@ -244,6 +259,7 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 								height={rec.height}
 								stroke="red"
 								draggable={true}
+								onDragMove={handleDragMove}
 								onClick={handleRecClick}
 								onTap={handleRecTap}
 							/>
