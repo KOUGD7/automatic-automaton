@@ -2,3 +2,5 @@ build:
   docker:
     server: server/Dockerfile
     client: client/Dockerfile
+run:
+  client: ionic serve --port 80 --nobrowser --nolivereload --noopen
