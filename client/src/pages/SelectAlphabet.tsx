@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
 	IonContent,
 	IonHeader,
@@ -14,13 +14,14 @@ import {
 	IonButton,
 } from '@ionic/react';
 
-import { Stage, Layer, Circle, Image } from 'react-konva';
+import { Stage, Layer, Rect, Image } from 'react-konva';
 import { KonvaEventObject } from 'konva/types/Node';
 
 import { RouteComponentProps } from 'react-router';
 import { Photo } from '../models';
 import './SelectAlphabet.css';
-import API from '../api';
+import Konva from 'konva';
+import { usePhotoUpload } from '../hooks/usePhotoUpload';
 
 interface RouterLocationState {
 	photo: Photo;
@@ -31,27 +32,26 @@ interface Dimensions {
 	height: number;
 }
 
-interface Coordinates {
+interface RecAttributes {
 	x: number;
 	y: number;
+	width: number;
+	height: number;
+	stroke: string;
 }
 
 const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	const { photo } = props.location.state as RouterLocationState;
 	const [image, setImage] = useState(new window.Image());
 	const [imgDimensions, setImgDimensions] = useState<Dimensions>();
-	const [startCircleCoords, setStartCircleCoords] = useState<Coordinates>({
-		x: 10,
-		y: 10,
+	const [rec, setRec] = useState<RecAttributes>({
+		x: 5,
+		y: 5,
+		width: 100,
+		height: 100,
+		stroke: 'red',
 	});
-	const [endCircleCoords, setEndCircleCoords] = useState<Coordinates>({
-		x: 10,
-		y: 40,
-	});
-	const radius = 10;
-
-	const [recCoords, setRecCoords] = useState<Coordinates>({ x: 5, y: 5 });
-	// const [recDimensions, setRecDimensions] = useState<Dimensions>({width: 100, height: 100});
+	const { startUpload } = usePhotoUpload();
 
 	useEffect(() => {
 		const img = new window.Image();
@@ -69,33 +69,122 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	const width = imgDimensions?.width;
 	const height = imgDimensions?.height;
 
-	const sendPhoto = async () => {
-		const formData: FormData = new FormData();
-		formData.append('image', photo.filepath);
-		let resp = await API.post('/preprocess-image', formData);
-		console.log(resp);
+	// const startUpload = () => {
+	// 	file.resolveLocalFilesystemUrl(photo.filepath).then((entry: FileEntry) => {
+	// 		entry.file(file => readFile(file));
+	// 	}, console.error);
+	// };
+
+	// const readFile = (file: any) => {
+	// 	const reader = new FileReader();
+	// 	reader.onload = () => {
+	// 		const formData = new FormData();
+	// 		const imgBlob = new Blob([reader.result], {
+	// 			type: file.type,
+	// 		});
+	// 		formData.append('image', imgBlob, file.name);
+	// 		sendPhoto(formData);
+	// 	};
+	// };
+
+	// const sendPhoto = async (formData: FormData) => {
+	// 	let resp = await API.post('/preprocess-image', formData);
+	// 	console.log(resp);
+	// };
+
+	const handleRecClick = (evt: KonvaEventObject<MouseEvent>) => {
+		console.log('rectangle selected');
+
+		let rect = evt.currentTarget;
+		let layer = evt.target.getLayer();
+		let tr = new Konva.Transformer();
+
+		layer.add(tr);
+		tr.nodes([rect]);
+
+		layer.draw();
+
+		rect.on('transformstart', function () {
+			console.log('transform start');
+		});
+
+		rect.on('dragmove', function () {
+			updateRect();
+		});
+
+		rect.on('transform', function () {
+			updateRect();
+			console.log('transform');
+		});
+
+		rect.on('transformend', function () {
+			console.log('transform end');
+		});
+
+		// Deselects the rectangle by removing the rectangle from the transformer
+		let stage = layer.getStage();
+
+		stage.on('dblclick', function () {
+			tr.nodes([]);
+			layer.draw();
+		});
+
+		function updateRect() {
+			let x = rect.x();
+			let y = rect.y();
+			let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
+			let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
+			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+
+			layer.batchDraw();
+		}
 	};
 
-	const handleClick = (evt: KonvaEventObject<MouseEvent>) => {
-		const { clientX, clientY } = evt.evt;
-		setRecCoords({ x: clientX - 45, y: clientY - 175 });
-		console.log(clientX, clientY);
-	};
+	const handleRecTap = (evt: KonvaEventObject<TouchEvent>) => {
+		console.log('rectangle selected');
 
-	const handleTap = (evt: KonvaEventObject<TouchEvent>) => {
-		console.log(evt.evt);
-		const { clientX, clientY } = evt.evt.changedTouches[0];
-		setRecCoords({ x: clientX - 45, y: clientY - 175 });
-		//   console.log(clientX, clientY);
-	};
+		let rect = evt.currentTarget;
+		let layer = evt.target.getLayer();
+		let tr = new Konva.Transformer();
 
-	const handleDrag = (evt: any, ball: string) => {
-		const { clientX, clientY } = evt.evt.changedTouches[0];
-		console.log('drag stop', evt, clientX, clientY - 129);
-		if (ball === 'start') {
-			setStartCircleCoords({ x: clientX, y: clientY - 129 });
-		} else {
-			setEndCircleCoords({ x: clientX, y: clientY - 129 });
+		layer.add(tr);
+		tr.nodes([rect]);
+
+		layer.draw();
+
+		rect.on('transformstart', function () {
+			console.log('transform start');
+		});
+
+		rect.on('dragmove', function () {
+			updateRect();
+		});
+
+		rect.on('transform', function () {
+			updateRect();
+			console.log('transform');
+		});
+
+		rect.on('transformend', function () {
+			console.log('transform end');
+		});
+
+		// Deselects the rectangle by removing the rectangle from the transformer
+		let stage = layer.getStage();
+
+		stage.on('dbltap', function () {
+			tr.nodes([]);
+			layer.draw();
+		});
+
+		function updateRect() {
+			let x = rect.x();
+			let y = rect.y();
+			let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
+			let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
+			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+
+			layer.batchDraw();
 		}
 	};
 
@@ -113,42 +202,31 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 				<IonCard>
 					<IonCardHeader>
 						<IonCardSubtitle>
-							Place the green dot at the top left corner of the list of symbols
-							in your alphabet, and the red cirle at the bottom right corner.
+							Draw a box around the alphabet in the image
 						</IonCardSubtitle>
 					</IonCardHeader>
 				</IonCard>
-				<div className="container flex">
+				<div className="container">
 					<Stage width={width} height={height}>
-						{/* { photo && <img className="img" src={photo.base64 ?? photo.webviewPath} alt="deterministic finite automaton" height={`${height}`} width={`${width}`} />} */}
 						<Layer>
-							<Image
-								image={image}
-								// onClick={handleClick}
-								// onTap={handleTap}
-							/>
-							<Circle
-								x={startCircleCoords.x}
-								y={startCircleCoords.y}
-								radius={radius}
-								fill="green"
-								draggable
-								onDragEnd={e => handleDrag(e, 'start')}
-							/>
-							<Circle
-								x={endCircleCoords.x}
-								y={endCircleCoords.y}
-								radius={radius}
-								fill="red"
-								draggable
-								onDragEnd={e => handleDrag(e, 'end')}
+							<Image image={image} />
+							<Rect
+								name="rect"
+								x={rec.x}
+								y={rec.y}
+								width={rec.width}
+								height={rec.height}
+								stroke="red"
+								draggable={true}
+								onClick={handleRecClick}
+								onTap={handleRecTap}
 							/>
 						</Layer>
 					</Stage>
 				</div>
 			</IonContent>
 			<IonFooter>
-				<IonButton onClick={sendPhoto}>Send Photo</IonButton>
+				<IonButton onClick={() => startUpload(photo)}>Send Photo</IonButton>
 			</IonFooter>
 		</IonPage>
 	);
