@@ -3,4 +3,5 @@ build:
     server: server/Dockerfile
     client: client/Dockerfile
 run:
-  client: ionic serve --port 80 --nobrowser --nolivereload --noopen
+  server: uvicorn main:app
+  client: ionic serve --nobrowser --nolivereload --noopen

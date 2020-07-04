@@ -1,3 +1,8 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM python:3.7
 
-COPY aautomata /app
+COPY requirements.txt .
+RUN python3 -m pip install -r requirements.txt --no-cache-dir
+
+COPY . .
+
+EXPOSE 8080
