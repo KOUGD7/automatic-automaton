@@ -130,3 +130,7 @@ dmypy.json
 
 # leave uploaded files out of commits
 uploads/*
+
+
+# misc
+.DS_Store
