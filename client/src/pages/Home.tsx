@@ -1,6 +1,6 @@
 import React from 'react';
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar,
-      IonImg, IonCard, IonCardHeader,
+      IonImg, IonCard, IonCardHeader, IonButton,
       IonCardSubtitle, IonCardTitle ,IonFab, IonFabButton, IonIcon } from '@ionic/react';
 
 import { RouteComponentProps } from 'react-router';
@@ -55,17 +55,15 @@ const Home: React.FC<RouteComponentProps> = (props) => {
         </IonFab>
 
         <IonFab hidden={hide} vertical="bottom" horizontal="start" slot="fixed">
-          <IonFabButton onClick={() => takePhoto() }>
-            <IonIcon icon={camera} />
-            {/* Retake */}
-          </IonFabButton>
+          <IonButton onClick={() => takePhoto() }>
+            Retake
+          </IonButton>
         </IonFab>
 
         <IonFab hidden={hide} vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton onClick={() => props.history.push('/alphabet', {photo: photo}) }>
-            {/* <IonIcon icon={camera} /> */}
+          <IonButton onClick={() => props.history.push('/alphabet', {photo: photo}) }>
             Continue
-          </IonFabButton>
+          </IonButton>
         </IonFab>
         
       </IonContent>
