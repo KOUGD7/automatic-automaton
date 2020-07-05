@@ -17,6 +17,9 @@ const useSliders = (title: string): [number, number, React.FC] => {
 				<IonListHeader>{title}</IonListHeader>
 				<IonItem>
 					<IonRange
+						min={0}
+						step={1}
+						max={1000}
 						pin={true}
 						value={maxValue}
 						onIonChange={e => setMaxValue(e.detail.value as number)}
@@ -27,6 +30,9 @@ const useSliders = (title: string): [number, number, React.FC] => {
 				</IonItem>
 				<IonItem>
 					<IonRange
+						min={0}
+						step={1}
+						max={1000}
 						pin={true}
 						value={minValue}
 						onIonChange={e => setMinValue(e.detail.value as number)}
