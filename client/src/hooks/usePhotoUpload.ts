@@ -2,7 +2,7 @@ import { Photo, RectCoords, Coords } from '../models';
 import API from '../api.js';
 
 export function usePhotoUpload(): {
-	startUpload(
+	prepareForm(
 		photo: Photo,
 		coords: RectCoords,
 		min_radius: number,
@@ -11,9 +11,9 @@ export function usePhotoUpload(): {
 		max_area: number,
 		quality: number,
 		max_alpha: number
-	): void;
+	): Promise<FormData>;
 } {
-	const startUpload = async (
+	const prepareForm = async (
 		photo: Photo,
 		coords: any,
 		min_radius: number,
@@ -35,7 +35,10 @@ export function usePhotoUpload(): {
 		formData.append('max_area', max_area.toString());
 		formData.append('quality', quality.toString());
 		formData.append('max_alpha', max_alpha.toString());
-		sendPhoto(formData);
+		// const data = await sendPhoto(formData);
+		// return data.data;
+
+		return formData;
 	};
 
 	const convertToBlob = async (photo: any) => {
@@ -43,12 +46,7 @@ export function usePhotoUpload(): {
 		return blob;
 	};
 
-	const sendPhoto = async (formData: FormData) => {
-		let resp = await API.post('/process-image', formData);
-		console.log(resp);
-	};
-
 	return {
-		startUpload,
+		prepareForm,
 	};
 }
