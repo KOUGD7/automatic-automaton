@@ -97,9 +97,10 @@ class BaseTransitionDetector(Detector):
 
         :param: img is a preprocessed image
         """
+        thresh = np.uint8(img)
 
         nb_components, output, stats, centroids = cv.connectedComponentsWithStats(
-            img)
+            thresh)
 
         sizes = stats[1:, -1]
         nb_components = nb_components - 1
@@ -111,7 +112,7 @@ class BaseTransitionDetector(Detector):
                 img2[output == i + 1] = 255
 
         contours, _ = cv.findContours(
-            img, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+            thresh, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
 
         i = 0
         arrows = []
@@ -127,7 +128,7 @@ class BaseTransitionDetector(Detector):
             else:
                 cx, cy = 0, 0
             if original_img is not None:
-                cv.circle(img, (cx, cy), 3, (200, 10, 200), -1)
+                cv.circle(original_img, (cx, cy), 3, (200, 10, 200), -1)
 
             # compute the rotated bounding box of the contour
             rect = cv.minAreaRect(contour)
@@ -184,7 +185,7 @@ class BaseTransitionDetector(Detector):
 
             arrows.append((start_point, end_point))
 
-        return arrows
+        return thresh, arrows
 
 
 class BaseLabelDetector(Detector):
@@ -264,10 +265,10 @@ class BaseLabelDetector(Detector):
         return rects, centroids2, img2, img3  # , num_labels2, labels2, stats2
 
 
-def compare_labels(templates, sub_images):
+def compare_labels(alpha1, label1):
 
-    alpha, a_rect = templates
-    label, l_rect = sub_images
+    alpha, a_rect = alpha1
+    label, l_rect = label1
 
     a_upper_corner, a_lower_corner = a_rect
     x_a, y_a = a_upper_corner
@@ -339,7 +340,7 @@ class BaseAlphabetDetector(Detector):
         for s in sub_images:
             count_templates = 0
             max_index = 0
-            alphaindex = -1
+            alpha_index = -1
             for t in templates:
                 mapping[count_templates] = t
 
@@ -352,10 +353,13 @@ class BaseAlphabetDetector(Detector):
 
             sub_s, rect_s = s
             upper_corner, lower_corner = rect_s
-            cv.putText(original_img, str(alphaindex), upper_corner,
-                       cv.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 0), thickness=2)
+            if original_img is not None:
+                cv.putText(original_img, str(alpha_index), upper_corner,
+                           cv.FONT_HERSHEY_COMPLEX, 0.6, (0, 0, 0), thickness=2)
 
-            new_rects.append((alphaindex, rect_s))
+            new_rects.append((alpha_index, rect_s))
             count_sub_images += 1
 
+        cv.imshow('ConnectLabels', l_img)
+        cv.imshow('ConnectAlphabet', a_img)
         return mapping, new_rects

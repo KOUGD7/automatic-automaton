@@ -58,9 +58,13 @@ class BasePreprocessor(Preprocessor):
             raise(e)
 
     @staticmethod
-    def preprocess(img):
+    def preprocess(img, alphaimg):
         """Run the preprocessing pipeline by smoothing, grayscaling then binarizing the input image in that order"""
         smoothed_img = BasePreprocessor.smooth(img)
         grayscale_img = BasePreprocessor.convert_to_grayscale(smoothed_img)
         binary_img = BasePreprocessor.binarize(grayscale_img)
-        return binary_img
+
+        smoothed_alpha = BasePreprocessor.smooth(alphaimg)
+        grayscale_img = BasePreprocessor.convert_to_grayscale(smoothed_alpha)
+        binary_alpha = BasePreprocessor.binarize(grayscale_img)
+        return binary_img, binary_alpha

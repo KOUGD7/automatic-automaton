@@ -29,13 +29,13 @@ images = {}
 
 
 @app.post('/process-image')
-async def preprocess_image(image: UploadFile = File(...),
-                           min_radius: int = Form(...),
-                           max_radius: int = Form(...),
-                           quality: float = Form(...),
-                           min_area: int = Form(...),
-                           max_area: int = Form(...),
-                           max_alpha: int = Form(...)):
+async def process_image(image: UploadFile = File(...),
+                        min_radius: int = Form(...),
+                        max_radius: int = Form(...),
+                        quality: float = Form(...),
+                        min_area: int = Form(...),
+                        max_area: int = Form(...),
+                        max_alpha: int = Form(...)):
     """Accepts an image and returns a processed version"""
 
     try:
@@ -87,7 +87,7 @@ def associate_features(image_filename: str):
         root = BaseAssociator.associated(
             img['states'], img['transitions'], img['labels'])
 
-        return {'graph': root}
+        return {'root': root}
     except Exception as e:
         return {'error': str(e)}
 
