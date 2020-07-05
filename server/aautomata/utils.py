@@ -16,7 +16,6 @@ def save_file(file_path: str, file: File) -> None:
         shutil.copyfileobj(file, temp_file)
         temp_file.close()
     except Exception as e:
-        print('problems')
         raise(e)
 
 
