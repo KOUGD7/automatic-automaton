@@ -20,7 +20,7 @@ import {
 	IonList,
 	IonListHeader,
 } from '@ionic/react';
-import { send } from 'ionicons/icons';
+import './TweakParams.css';
 
 interface TweakParamsProps {
 	photo: Photo;
@@ -28,15 +28,23 @@ interface TweakParamsProps {
 }
 
 const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
-	const [maxArea, minArea, AreaSliders] = useSliders('Area');
-	const [maxRadius, minRadius, RadiusSliders] = useSliders('Radius');
+	const [img, setImg] = useState(photo.base64 ?? photo.webviewPath);
+	const [sentFirstPic, setSentFirstPic] = useState(false);
+	// const [maxArea, minArea, AreaSliders] = useSliders('Area');
+	// const [maxRadius, minRadius, RadiusSliders] = useSliders('Radius');
 	const [quality, setQuality] = useState(0);
 	const [maxAlpha, setMaxAlpha] = useState(0);
 
-	const { startUpload } = usePhotoUpload();
+	const [minArea, setMinArea] = useState(0);
+	const [maxArea, setMaxArea] = useState(0);
 
-	const sendPhoto = () => {
-		startUpload(
+	const [minRadius, setMinRadius] = useState(0);
+	const [maxRadius, setMaxRadius] = useState(0);
+
+	const { prepareForm } = usePhotoUpload();
+
+	const sendPhoto = async () => {
+		const formData: FormData = await prepareForm(
 			photo,
 			rectCoords,
 			minRadius,
@@ -46,6 +54,17 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 			quality,
 			maxAlpha
 		);
+
+		let resp = await API.post('/process-image', formData, {
+			responseType: 'blob',
+		});
+
+		let blob: Blob = resp.data;
+
+		let urlCreator = window.URL || window.webkitURL;
+		let imgUrl = urlCreator.createObjectURL(blob);
+		setImg(imgUrl);
+		setSentFirstPic(true);
 	};
 
 	useEffect(() => {
@@ -58,26 +77,79 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 					<IonButtons slot="start">
 						<IonBackButton />
 					</IonButtons>
-					<IonTitle>Select Alphabet</IonTitle>
+					<IonTitle>Tweak Parameter</IonTitle>
 				</IonToolbar>
 			</IonHeader>
 			<IonContent className="ion-padding">
 				<IonCard>
-					<img
-						src={photo.base64 ?? photo.webviewPath}
-						alt="Image to be processed"
-					/>
+					<img src={img} alt="Image to be processed" />
 				</IonCard>
-				<AreaSliders />
-				<RadiusSliders />
+				{/* <AreaSliders />
+				<RadiusSliders /> */}
+
 				<IonList>
-					<IonListHeader>Quality</IonListHeader>
+					<IonListHeader>Area</IonListHeader>
+					<IonItem>
+						<IonRange
+							min={0}
+							step={1}
+							max={300}
+							value={maxArea}
+							onIonChange={e => setMaxArea(e.detail.value as number)}
+						>
+							<IonLabel slot="start">Max:</IonLabel>
+							<IonLabel slot="end">{maxArea}</IonLabel>
+						</IonRange>
+					</IonItem>
+					<IonItem>
+						<IonRange
+							min={0}
+							step={1}
+							max={300}
+							value={minArea}
+							onIonChange={e => setMinArea(e.detail.value as number)}
+						>
+							<IonLabel slot="start">Min:</IonLabel>
+							<IonLabel slot="end">{minArea}</IonLabel>
+						</IonRange>
+					</IonItem>
+				</IonList>
+
+				<IonList>
+					<IonListHeader>Radius</IonListHeader>
+					<IonItem>
+						<IonRange
+							min={0}
+							step={1}
+							max={300}
+							value={maxRadius}
+							onIonChange={e => setMaxRadius(e.detail.value as number)}
+						>
+							<IonLabel slot="start">Max:</IonLabel>
+							<IonLabel slot="end">{maxRadius}</IonLabel>
+						</IonRange>
+					</IonItem>
+					<IonItem>
+						<IonRange
+							min={0}
+							step={1}
+							max={300}
+							value={minRadius}
+							onIonChange={e => setMinRadius(e.detail.value as number)}
+						>
+							<IonLabel slot="start">Min:</IonLabel>
+							<IonLabel slot="end">{minRadius}</IonLabel>
+						</IonRange>
+					</IonItem>
+				</IonList>
+
+				<IonList>
+					<IonListHeader>Other</IonListHeader>
 					<IonItem>
 						<IonRange
 							min={0}
 							max={1}
 							step={0.1}
-							pin={true}
 							value={quality}
 							onIonChange={e => setQuality(e.detail.value as number)}
 						>
@@ -85,15 +157,12 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 							<IonLabel slot="end">{quality}</IonLabel>
 						</IonRange>
 					</IonItem>
-				</IonList>
-				<IonList>
-					<IonListHeader>Max Alpha</IonListHeader>
+
 					<IonItem>
 						<IonRange
 							min={0}
 							max={1000}
 							step={1}
-							pin={true}
 							value={maxAlpha}
 							onIonChange={e => setMaxAlpha(e.detail.value as number)}
 						>
@@ -104,8 +173,15 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 				</IonList>
 			</IonContent>
 			<IonFooter>
-				<IonButton expand="full" onClick={sendPhoto}>
-					Send Image
+				<IonButton
+					expand="block"
+					fill={sentFirstPic ? 'outline' : 'solid'}
+					onClick={sendPhoto}
+				>
+					{sentFirstPic ? 'Tweak Image' : 'Send Photo'}
+				</IonButton>
+				<IonButton expand="block" fill="solid" onClick={() => {}}>
+					Ready to Get Graph
 				</IonButton>
 			</IonFooter>
 		</IonPage>
