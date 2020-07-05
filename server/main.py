@@ -2,8 +2,10 @@ import os
 import io
 import pandas as pd
 import cv2 as cv
+import uvicorn
 from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
 from starlette.responses import StreamingResponse
 from typing import Optional
 
@@ -11,6 +13,7 @@ from aautomata.utils import save_file, delete_file, resize
 
 from aautomata.plugins.preprocessor import BasePreprocessor
 from aautomata.plugins.detector import BaseStateDetector, BaseTransitionDetector, BaseLabelDetector, BaseAlphabetDetector
+from aautomata.plugins.associator import BaseAssociator
 
 app = FastAPI()
 
@@ -21,6 +24,8 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*']
 )
+
+images = {}
 
 
 @app.post('/process-image')
@@ -56,8 +61,36 @@ async def preprocess_image(image: UploadFile = File(...),
             pre, min_area, max_area, resized_img)
         labels = BaseAlphabetDetector.detect(pre_labels, pre, max_alpha)
 
+        images[image.filename] = {
+            'states': states,
+            'transitions': transitions,
+            'labels': labels
+        }
+
         _, img_encoding = cv.imencode(f'.{mime_type}', resized_img)
 
         return StreamingResponse(io.BytesIO(img_encoding.tobytes()), media_type=f'image/{mime_type}')
     except Exception as e:
         return {'error':  str(e)}
+
+
+@app.get('/associate-features/{image_filename}')
+def associate_features(image_filename: str):
+    """Associates the features of a given image and returns the built graph"""
+
+    try:
+        if image_filename not in images:
+            raise(Exception('ImageNotFoundError: No image was found with this name.'))
+
+        img = images[image_filename]
+
+        root = BaseAssociator.associated(
+            img['states'], img['transitions'], img['labels'])
+
+        return {'graph': root}
+    except Exception as e:
+        return {'error': str(e)}
+
+
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8000)

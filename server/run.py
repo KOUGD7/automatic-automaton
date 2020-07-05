@@ -31,7 +31,7 @@ if __name__ == '__main__':
     pre_labels = BaseLabelDetector.detect(res, min_area, max_area, img)
     labels = BaseAlphabetDetector.detect(pre_labels, res, max_alpha)
 
-    root = BaseAssociator.associate(states, transitions, labels)
+    root = BaseAssociator.associated(states, transitions, labels)
 
     cv.imshow(panel_name, img)
     cv.waitKey(0)
