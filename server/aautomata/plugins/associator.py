@@ -36,7 +36,8 @@ class BaseAssociator(Associator):
             o_transitions.append(transition)
 
         o_labels = set()
-        for l in labels:
+        mapping, labels1 = labels
+        for l in labels1:
             value, rec = l
             label = Label(value, rec)
             o_labels.add(label)
@@ -51,7 +52,7 @@ class BaseAssociator(Associator):
                         cv.circle(original_img, state_j.centre,
                                   state_j.radius, (255, 0, 255), 2)
                     states_to_remove.append(state_j)
-                    state_i.set_final()
+                    state_i.set_accepting()
 
         for state in states_to_remove:
             if state in o_states:

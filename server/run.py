@@ -4,8 +4,8 @@ import numpy as np
 from aautomata.utils import resize
 
 from aautomata.plugins.preprocessor import BasePreprocessor
-from aautomata.plugins.detector import BaseStateDetector, BaseTransitionDetector, BaseLabelDetector
-from aautomata.plugins.associator import BaseStateAssociator, BaseLabelAssociator
+from aautomata.plugins.detector import BaseStateDetector, BaseTransitionDetector, BaseLabelDetector, BaseAlphabetDetector
+from aautomata.plugins.associator import BaseAssociator
 
 
 if __name__ == '__main__':
@@ -24,14 +24,14 @@ if __name__ == '__main__':
     max_radius = 1000
     min_area = 500
     max_area = 1000
-    state_data = BaseStateDetector.detect(
+    max_alpha = 1000
+    states = BaseStateDetector.detect(
         res, min_radius, max_radius, quality, img)
-    transition_data = BaseTransitionDetector.detect(res, img)
-    label_data = BaseLabelDetector.detect(res, min_area, max_area, img)
+    transitions = BaseTransitionDetector.detect(res, img)
+    pre_labels = BaseLabelDetector.detect(res, min_area, max_area, img)
+    labels = BaseAlphabetDetector.detect(pre_labels, res, max_alpha)
 
-    print(state_data)
-    print(transition_data)
-    print(label_data)
+    root = BaseAssociator.associate(states, transitions, labels)
 
     cv.imshow(panel_name, img)
     cv.waitKey(0)
