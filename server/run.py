@@ -86,23 +86,29 @@ if __name__ == "__main__":
         state_mask_w = 5
 
         if select == 0:
-            img = cv.imread("aautomata/uploads/t1.jpg")
-            alphaimg = cv.imread('aautomata/uploads/alphabett1.jpg')
+            img = cv.imread("aautomata/uploads/t6.jpg")
+            # alphaimg = cv.imread('aautomata/uploads/alphabett1.jpg')
             eff = 0.78
         else:
-            img = cv.imread('aautomata/uploads/t1.jpg')
-            alphaimg = cv.imread('aautomata/uploads/alphabett1.jpg')
+            img = cv.imread('aautomata/uploads/t6.jpg')
+            # alphaimg = cv.imread('aautomata/uploads/alphabett1.jpg')
             eff = 0.78
 
         # create different copy to use to labels from the circles
         cimg = img.copy()
 
+        alpha_img = cimg[160:1000, 250:1000]
+
+        alpha_mask = np.zeros(alpha_img.shape[:2], dtype='uint8')
+
         # return binary for both image
-        thresh, alphathresh = BasePreprocessor.preprocess(img, alphaimg)
+        thresh, alphathresh = BasePreprocessor.preprocess(img, alpha_img)
+
+        thresh[160:1000, 250:1000] = alpha_mask
 
         labels = BaseLabelDetector.detect(thresh, minA, maxA, cimg)
         newLabels = BaseAlphabetDetector.detect(
-            labels, alphathresh, maxAlpha, cimg)
+            labels, alphathresh, maxAlpha, cimg, True)
 
         cIthresh = thresh.copy()
         shapes = BaseStateDetector.detect(cIthresh, minR, maxR, eff, cimg)

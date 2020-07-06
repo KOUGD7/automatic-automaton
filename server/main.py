@@ -58,15 +58,22 @@ async def process_image(image: UploadFile = File(...),
         upper_corner = bounding_box[0]
         lower_corner = bounding_box[3]
 
-        alphabet_img = src_img[int(upper_corner['x']): int(lower_corner['x']),
-                               int(upper_corner['y']): int(lower_corner['y'])]
+        alphabet_img = src_img[int(upper_corner['y']): int(lower_corner['y']),
+                               int(upper_corner['x']): int(lower_corner['x'])]
 
         # defines the greatest dimension an image can have
-        MAX_IMAGE_SIZE = 1000  # measured in pixels
-        resized_img = resize(src_img, MAX_IMAGE_SIZE)
+        # MAX_IMAGE_SIZE = 1000  # measured in pixels
+        # resized_img = resize(thresh, MAX_IMAGE_SIZE)
+        resized_img = src_img
 
         thresh, alpha_thresh = BasePreprocessor.preprocess(
             resized_img, alphabet_img)
+
+        # remove the alphabet from the preprocessed image
+        alphabet_mask = np.zeros(alphabet_img.shape[:2], dtype='uint8')
+        thresh[int(upper_corner['y']): int(lower_corner['y']),
+               int(upper_corner['x']): int(lower_corner['x'])] = alphabet_mask
+
         pre_labels = BaseLabelDetector.detect(
             thresh, min_area, max_area, resized_img)
         labels = BaseAlphabetDetector.detect(
@@ -86,7 +93,8 @@ async def process_image(image: UploadFile = File(...),
 
         no_labels_img = cv.bitwise_and(no_labels_img, no_labels_img, mask=mask)
 
-        _, transitions = BaseTransitionDetector.detect(thresh, resized_img)
+        _, transitions = BaseTransitionDetector.detect(
+            no_labels_img, resized_img)
 
         images[image.filename] = {
             'states': states,
@@ -117,6 +125,7 @@ def associate_features(image_filename: str):
 
         return {'root': root, 'graph': graph}
     except Exception as e:
+        print(e)
         return {'error': str(e)}
 
 
