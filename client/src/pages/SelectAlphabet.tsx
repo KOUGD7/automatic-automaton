@@ -12,16 +12,18 @@ import {
 	IonCardSubtitle,
 	IonFooter,
 	IonButton,
+	IonModal,
 } from '@ionic/react';
 
-import { Stage, Layer, Rect, Image } from 'react-konva';
+import Konva from 'konva';
 import { KonvaEventObject } from 'konva/types/Node';
+import { Stage, Layer, Rect, Image } from 'react-konva';
+import './SelectAlphabet.css';
 
 import { RouteComponentProps } from 'react-router';
-import { Photo } from '../models';
-import './SelectAlphabet.css';
-import Konva from 'konva';
-import { usePhotoUpload } from '../hooks/usePhotoUpload';
+import { Photo, RectCoords } from '../models';
+
+import TweakParams from './TweakParams';
 
 interface RouterLocationState {
 	photo: Photo;
@@ -40,17 +42,11 @@ interface RecAttributes {
 	stroke: string;
 }
 
-interface RectCoords {
-	topR: {x: Number, y: Number};
-	topL: {x: Number, y: Number};
-	bottomR: {x: Number, y: Number};
-	bottomL: {x: Number, y: Number};
-}
-
 const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	const { photo } = props.location.state as RouterLocationState;
 	const [image, setImage] = useState(new window.Image());
 	const [imgDimensions, setImgDimensions] = useState<Dimensions>();
+	const [showModal, setShowModal] = useState(false);
 	const [rec, setRec] = useState<RecAttributes>({
 		x: 5,
 		y: 5,
@@ -58,14 +54,13 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 		height: 100,
 		stroke: 'red',
 	});
-	const [recCoords, setCoords] = useState<RectCoords>({
-		topR: {x: rec.x, y: rec.y},
-		topL: {x: rec.x+rec.width, y: rec.y},
-		bottomR: {x: rec.x, y: rec.y+rec.height},
-		bottomL: {x: rec.x+rec.width, y: rec.y+rec.height}
-	});
 
-	const { startUpload } = usePhotoUpload();
+	const [recCoords, setRecCoords] = useState<RectCoords>({
+		topR: { x: rec.x, y: rec.y },
+		topL: { x: rec.x + rec.width, y: rec.y },
+		bottomR: { x: rec.x, y: rec.y + rec.height },
+		bottomL: { x: rec.x + rec.width, y: rec.y + rec.height },
+	});
 
 	useEffect(() => {
 		const img = new window.Image();
@@ -82,29 +77,6 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 
 	const width = imgDimensions?.width;
 	const height = imgDimensions?.height;
-
-	// const startUpload = () => {
-	// 	file.resolveLocalFilesystemUrl(photo.filepath).then((entry: FileEntry) => {
-	// 		entry.file(file => readFile(file));
-	// 	}, console.error);
-	// };
-
-	// const readFile = (file: any) => {
-	// 	const reader = new FileReader();
-	// 	reader.onload = () => {
-	// 		const formData = new FormData();
-	// 		const imgBlob = new Blob([reader.result], {
-	// 			type: file.type,
-	// 		});
-	// 		formData.append('image', imgBlob, file.name);
-	// 		sendPhoto(formData);
-	// 	};
-	// };
-
-	// const sendPhoto = async (formData: FormData) => {
-	// 	let resp = await API.post('/preprocess-image', formData);
-	// 	console.log(resp);
-	// };
 
 	const handleRecClick = (evt: KonvaEventObject<MouseEvent>) => {
 		console.log('rectangle selected');
@@ -319,9 +291,14 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 						</Layer>
 					</Stage>
 				</div>
+				<IonModal isOpen={showModal}>
+					<TweakParams photo={photo} rectCoords={recCoords} />
+				</IonModal>
 			</IonContent>
 			<IonFooter>
-				<IonButton onClick={() => startUpload(photo)}>Send Photo</IonButton>
+				<IonButton expand="full" onClick={() => setShowModal(true)}>
+					Send Photo
+				</IonButton>
 			</IonFooter>
 		</IonPage>
 	);

@@ -2,15 +2,18 @@ import os
 import io
 import pandas as pd
 import cv2 as cv
-from fastapi import FastAPI, File, UploadFile
+import uvicorn
+from fastapi import FastAPI, File, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.encoders import jsonable_encoder
 from starlette.responses import StreamingResponse
 from typing import Optional
 
 from aautomata.utils import save_file, delete_file, resize
 
 from aautomata.plugins.preprocessor import BasePreprocessor
-from aautomata.plugins.detector import BaseStateDetector, BaseTransitionDetector, BaseLabelDetector
+from aautomata.plugins.detector import BaseStateDetector, BaseTransitionDetector, BaseLabelDetector, BaseAlphabetDetector
+from aautomata.plugins.associator import BaseAssociator
 
 app = FastAPI()
 
@@ -22,12 +25,18 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-working_img_tbl = {}
+images = {}
 
 
-@app.post('/preprocess-image')
-async def preprocess_image(image: UploadFile = File(...)):
-    """Accept an image and return a preprocessed version"""
+@app.post('/process-image')
+async def process_image(image: UploadFile = File(...),
+                        min_radius: int = Form(...),
+                        max_radius: int = Form(...),
+                        quality: float = Form(...),
+                        min_area: int = Form(...),
+                        max_area: int = Form(...),
+                        max_alpha: int = Form(...)):
+    """Accepts an image and returns a processed version"""
 
     try:
         mime_type = image.content_type.split('/')[1]
@@ -40,102 +49,67 @@ async def preprocess_image(image: UploadFile = File(...)):
 
         src_img = cv.imread(path_to_img)
 
+        # extract the alphabet from the image using the
+        # bounding box
+        alphabet_img = None
+
         # defines the greatest dimension an image can have
         MAX_IMAGE_SIZE = 1000  # measured in pixels
         resized_img = resize(src_img, MAX_IMAGE_SIZE)
 
-        preprocessed_img = BasePreprocessor.preprocess(resized_img)
-        _, img_encoding = cv.imencode(f'.{mime_type}', preprocessed_img)
+        thresh, alpha_thresh = BasePreprocessor.preprocess(
+            resized_img, alphabet_img)
+        pre_labels = BaseLabelDetector.detect(
+            thresh, min_area, max_area, resized_img)
+        labels = BaseAlphabetDetector.detect(
+            pre_labels, alpha_thresh, max_alpha, resized_img)
 
-        if image.filename in working_img_tbl:
-            raise(Exception("DuplicateNameError: Image name already exists."))
+        thresh_copy = thresh.copy()
+        states = BaseStateDetector.detect(
+            thresh_copy, min_radius, max_radius, quality, resized_img)
 
-        working_img_tbl[image.filename] = preprocessed_img
+        no_labels_img = pre_labels[2]
+
+        mask = np.ones(thresh_copy.shape[:2], dtype='uint8') * 255
+        state_contour = states[2]
+        line_thickness = 5
+        for contour in state_contour:
+            cv.drawContours(mask, [contour], -1, 0, line_thickness)
+
+        no_labels_img = cv.bitwise_and(no_labels, no_labels, mask=mask)
+
+        _, transitions = BaseTransitionDetector.detect(pre, resized_img)
+
+        images[image.filename] = {
+            'states': states,
+            'transitions': transitions,
+            'labels': labels
+        }
+
+        _, img_encoding = cv.imencode(f'.{mime_type}', resized_img)
 
         return StreamingResponse(io.BytesIO(img_encoding.tobytes()), media_type=f'image/{mime_type}')
     except Exception as e:
         return {'error':  str(e)}
 
 
-@app.post('/detect-states/{image_filename}')
-async def detect_states(image_filename: str, quality: float = 0, min_radius: int = 0, max_radius=1000):
-    """Detect the states in an image"""
+@app.get('/associate-features/{image_filename}')
+def associate_features(image_filename: str):
+    """Associates the features of a given image and returns the built graph"""
 
     try:
-        if image_filename not in working_img_tbl:
-            raise(Exception("KeyError: No image with this filename exists."))
+        if image_filename not in images:
+            raise(Exception('ImageNotFoundError: No image was found with this name.'))
 
-        img = working_img_tbl[image_filename]
-        states = BaseStateDetector.detect(
-            img, min_radius, max_radius, quality)
+        img = images[image_filename]
 
-        return {'states': pd.Series(states).to_json(orient='values')}
+        root, graph = BaseAssociator.associated(
+            img['states'], img['transitions'], img['labels'])
 
+        return {'root': root, 'graph' graph}
     except Exception as e:
         return {'error': str(e)}
 
 
-@app.post('/detect-transitions/{image_filename}')
-async def detect_transitions(image_filename: str):
-    """Detect the transition arrows in an image"""
-
-    try:
-        if image_filename not in working_img_tbl:
-            raise(Exception("KeyError: No image with this filename exists."))
-
-        img = working_img_tbl[image_filename]
-        transitions = BaseTransitionDetector.detect(img)
-
-        return {'transitions': transitions}
-
-    except Exception as e:
-        return {'error': str(e)}
-
-
-@app.post('/detect-labels/{image_filename}')
-async def detect_labels(image_filename: str, parameterForm):
-    """Detect the state labels in an image"""
-
-    try:
-        if image_filename not in working_img_tbl:
-            raise(Exception("KeyError: No image with this filename exists."))
-
-        img = working_img_tbl[image_filename]
-
-        min_area = parameterForm.min_area
-        max_area = parameterForm.max_area
-
-        labels = BaseLabelDetector.detect(img, min_area, max_area)
-
-        return {'labels': labels}
-
-    except Exception as e:
-        return {'error': str(e)}
-
-
-@app.post('/detect-all-features/{image_filename}')
-async def detect_all_features(image_filename: str, parameterForm):
-    """Detect the states, transitions and labels in an image"""
-
-    try:
-        if image_filename not in working_img_tbl:
-            raise(Exception("KeyError: No image with this filename exists."))
-
-        img = working_img_tbl[image_filename]
-
-        quality = parameterForm.quality
-        min_radius = parameterForm.min_radius
-        max_radius = parameterForm.max_radius
-        min_area = parameterForm.min_area
-        max_area = parameterForm.max_area
-
-        states = BaseStateDetector.detect(img, min_radius, max_radius, quality)
-        transitions = BaseTransitionDetector.detect(img)
-        labels = BaseLabelDetector.detect(img, min_area, max_area)
-
-        # return either the coordinates of everything or just the image itself
-        return {'states': states, 'transitions': transitions, 'labels': labels}
-
-        # return StreamingResponse(io.BytesIO(img_encoding.tobytes()), media_type=f'image/jpeg')
-    except Exception as e:
-        return {'error': str(e)}
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8000)

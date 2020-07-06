@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # leave uploaded files out of commits
-uploads/*
+aautomata/uploads/*
 
 
 # misc

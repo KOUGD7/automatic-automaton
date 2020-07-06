@@ -1,3 +1,6 @@
+import cv2 as cv
+import numpy as np
+
 from aautomata.utils import midpoint
 
 
@@ -12,3 +15,4 @@ class Label:
 
     def min_circle(self):
         centre, radius = cv.minEnclosingCircle(np.float32(self.rec))
+        return centre, radius
