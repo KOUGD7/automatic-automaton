@@ -128,20 +128,26 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			let rh = Math.round(Math.max(rect.height() * scaleY));
 
 			if (rw < 5 || rh < 5 || rw > stage.width || rh > stage.height) {
-				setRec({ x: rec.x, y: rec.y, width: rec.width, height: rec.height, stroke: 'red' });
-				setCoords({
-					topR: {x: recCoords.topR.x, y: recCoords.topR.y},
-					topL: {x: recCoords.topL.x, y: recCoords.topL.y},
-					bottomR: {x: recCoords.bottomR.x, y: recCoords.bottomR.y},
-					bottomL: {x: recCoords.bottomL.x, y: recCoords.bottomL.y}
+				setRec({
+					x: rec.x,
+					y: rec.y,
+					width: rec.width,
+					height: rec.height,
+					stroke: 'red',
+				});
+				setRecCoords({
+					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
+					topL: { x: recCoords.topL.x, y: recCoords.topL.y },
+					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+					bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
 				});
 			} else {
 				setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
-				setCoords({
-					topR: {x: x, y: y},
-					topL: {x: x+rw, y: y},
-					bottomR: {x: x, y: y+rh},
-					bottomL: {x: x+rw, y: y+rh}
+				setRecCoords({
+					topR: { x: x, y: y },
+					topL: { x: x + rw, y: y },
+					bottomR: { x: x, y: y + rh },
+					bottomL: { x: x + rw, y: y + rh },
 				});
 			}
 
@@ -199,20 +205,26 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			let rh = Math.round(Math.max(rect.height() * scaleY));
 
 			if (rw < 5 || rh < 5 || rw > stage.width || rh > stage.height) {
-				setRec({ x: rec.x, y: rec.y, width: rec.width, height: rec.height, stroke: 'red' });
-				setCoords({
-					topR: {x: recCoords.topR.x, y: recCoords.topR.y},
-					topL: {x: recCoords.topL.x, y: recCoords.topL.y},
-					bottomR: {x: recCoords.bottomR.x, y: recCoords.bottomR.y},
-					bottomL: {x: recCoords.bottomL.x, y: recCoords.bottomL.y}
+				setRec({
+					x: rec.x,
+					y: rec.y,
+					width: rec.width,
+					height: rec.height,
+					stroke: 'red',
+				});
+				setRecCoords({
+					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
+					topL: { x: recCoords.topL.x, y: recCoords.topL.y },
+					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+					bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
 				});
 			} else {
 				setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
-				setCoords({
-					topR: {x: x, y: y},
-					topL: {x: x+rw, y: y},
-					bottomR: {x: x, y: y+rh},
-					bottomL: {x: x+rw, y: y+rh}
+				setRecCoords({
+					topR: { x: x, y: y },
+					topL: { x: x + rw, y: y },
+					bottomR: { x: x, y: y + rh },
+					bottomL: { x: x + rw, y: y + rh },
 				});
 			}
 
@@ -223,7 +235,7 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	const handleDragMove = (evt: KonvaEventObject<DragEvent>) => {
 		let rect = evt.currentTarget;
 		let stage = evt.target.getLayer().getStage();
-		
+
 		let x = rect.x();
 		let y = rect.y();
 
@@ -234,22 +246,28 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 
 		let rw = Math.round(Math.max(5, rect.width() * scaleX));
 		let rh = Math.round(Math.max(rect.height() * scaleY));
-		
+
 		if (rw < 5 || rh < 5 || rw > stage.width || rh > stage.height) {
-			setRec({ x: rec.x, y: rec.y, width: rec.width, height: rec.height, stroke: 'red' });
-			setCoords({
-				topR: {x: recCoords.topR.x, y: recCoords.topR.y},
-				topL: {x: recCoords.topL.x, y: recCoords.topL.y},
-				bottomR: {x: recCoords.bottomR.x, y: recCoords.bottomR.y},
-				bottomL: {x: recCoords.bottomL.x, y: recCoords.bottomL.y}
+			setRec({
+				x: rec.x,
+				y: rec.y,
+				width: rec.width,
+				height: rec.height,
+				stroke: 'red',
+			});
+			setRecCoords({
+				topR: { x: recCoords.topR.x, y: recCoords.topR.y },
+				topL: { x: recCoords.topL.x, y: recCoords.topL.y },
+				bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+				bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
 			});
 		} else {
 			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
-			setCoords({
-				topR: {x: x, y: y},
-				topL: {x: x+rw, y: y},
-				bottomR: {x: x, y: y+rh},
-				bottomL: {x: x+rw, y: y+rh}
+			setRecCoords({
+				topR: { x: x, y: y },
+				topL: { x: x + rw, y: y },
+				bottomR: { x: x, y: y + rh },
+				bottomL: { x: x + rw, y: y + rh },
 			});
 		}
 	};
