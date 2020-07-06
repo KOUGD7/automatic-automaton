@@ -15,7 +15,6 @@ class BaseAssociator(Associator):
     """Component for associating states using transitions"""
     @staticmethod
     def associated(states, transitions, labels):
-        root = None
 
         radii, centres, _ = states
         states = zip(radii, centres)
@@ -68,6 +67,12 @@ class BaseAssociator(Associator):
                 if label in o_labels:
                     o_labels.remove(label)
 
+        # create an unconnected graph out of the labelled states
+        graph = {}
+        for state in o_states:
+            label_hash = hash(str(get_label(state)))
+            graph[label_hash] = state
+
         # associate labels and transitions
         for transition in o_transitions:
             min_dist = 10**10
@@ -84,6 +89,7 @@ class BaseAssociator(Associator):
                 set_input(transition, min_label)
                 o_labels.remove(min_label)
 
+        root = None
         # associate states and transitions
         for transition in o_transitions:
             min_head = 10**10
@@ -103,13 +109,14 @@ class BaseAssociator(Associator):
                     min_tail = dist_tail
 
             if get_input(transition):
-                add_transition(tail_state, get_input(transition), head_state)
+                add_transition(tail_state, get_input(
+                    transition), hash(str(get_label(head_state))))
             else:
-                root = head_state
+                root = hash(str(get_label(state)))
 
-        return root
+        return root, graph
 
-    @staticmethod
+    @ staticmethod
     def associate(states, transitions, labels, original_img=None):
         root = None
         # testing

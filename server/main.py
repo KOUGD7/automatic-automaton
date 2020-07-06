@@ -49,17 +49,36 @@ async def process_image(image: UploadFile = File(...),
 
         src_img = cv.imread(path_to_img)
 
+        # extract the alphabet from the image using the
+        # bounding box
+        alphabet_img = None
+
         # defines the greatest dimension an image can have
         MAX_IMAGE_SIZE = 1000  # measured in pixels
         resized_img = resize(src_img, MAX_IMAGE_SIZE)
 
-        pre = BasePreprocessor.preprocess(resized_img)
-        states = BaseStateDetector.detect(
-            pre, min_radius, max_radius, quality, resized_img)
-        transitions = BaseTransitionDetector.detect(pre, resized_img)
+        thresh, alpha_thresh = BasePreprocessor.preprocess(
+            resized_img, alphabet_img)
         pre_labels = BaseLabelDetector.detect(
-            pre, min_area, max_area, resized_img)
-        labels = BaseAlphabetDetector.detect(pre_labels, pre, max_alpha)
+            thresh, min_area, max_area, resized_img)
+        labels = BaseAlphabetDetector.detect(
+            pre_labels, alpha_thresh, max_alpha, resized_img)
+
+        thresh_copy = thresh.copy()
+        states = BaseStateDetector.detect(
+            thresh_copy, min_radius, max_radius, quality, resized_img)
+
+        no_labels_img = pre_labels[2]
+
+        mask = np.ones(thresh_copy.shape[:2], dtype='uint8') * 255
+        state_contour = states[2]
+        line_thickness = 5
+        for contour in state_contour:
+            cv.drawContours(mask, [contour], -1, 0, line_thickness)
+
+        no_labels_img = cv.bitwise_and(no_labels, no_labels, mask=mask)
+
+        _, transitions = BaseTransitionDetector.detect(pre, resized_img)
 
         images[image.filename] = {
             'states': states,
@@ -84,10 +103,10 @@ def associate_features(image_filename: str):
 
         img = images[image_filename]
 
-        root = BaseAssociator.associated(
+        root, graph = BaseAssociator.associated(
             img['states'], img['transitions'], img['labels'])
 
-        return {'root': root}
+        return {'root': root, 'graph' graph}
     except Exception as e:
         return {'error': str(e)}
 

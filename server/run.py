@@ -127,7 +127,11 @@ if __name__ == "__main__":
 
         graph_check = cv.getTrackbarPos('Graph', 'Control Panel')
         if graph_check > 0:
-            graph = BaseAssociator.associate(shapes, arrows, newLabels)
+            root, graph = BaseAssociator.associated(shapes, arrows, newLabels)
+
+            print(root, graph)
+
+            break
 
             # UPDATE IMAGE WITH NEW INFO
             cv.imshow('Connect', img)
