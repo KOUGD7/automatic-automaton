@@ -44,7 +44,7 @@ export function useCameraPhoto() {
 		try {
 			const cameraPhoto = await getPhoto({
 				resultType: CameraResultType.Uri,
-				source: CameraSource.Camera,
+				source: CameraSource.Prompt,
 				quality: 100,
 			});
 
