@@ -16,6 +16,11 @@ export interface Coords {
 	y: number;
 }
 
+export interface SimulationResponse {
+	was_accepted: boolean;
+	stop_state?: number;
+}
+
 export interface GraphResponse {
 	root: number;
 	graph: Graph[];
@@ -69,8 +74,9 @@ export class State {
 	 * @param transitionBit the bit of the string to transition on next
 	 * @param graphArr the array of states
 	 */
-	next(transitionBit: number, graphArr: State[]): number {
+	next(transitionBitString: string, graphArr: State[]): number {
 		// check if i can transition on the bit
+		let transitionBit = parseInt(transitionBitString, 10);
 		if (this.transitions.hasOwnProperty(transitionBit)) {
 			// i can:  find whre it leads
 			graphArr.forEach(state => {
@@ -83,18 +89,18 @@ export class State {
 		return -1;
 	}
 
-	next2(testString: string, graphArr: State[]) {
-		let transitionBit = parseInt(testString[0], 10);
-		// check if i can transition on the bit
-		if (this.transitions.hasOwnProperty(transitionBit)) {
-			// i can:  find whre it leads
-			graphArr.forEach(state => {
-				if (state.label === this.transitions[transitionBit]) {
-					return state.next2(testString.slice(1), graphArr);
-				}
-			});
-		}
-		// i can't:  return false
-		return -1;
-	}
+	// next2(testString: string, graphArr: State[]) {
+	// 	let transitionBit = parseInt(testString[0], 10);
+	// 	// check if i can transition on the bit
+	// 	if (this.transitions.hasOwnProperty(transitionBit)) {
+	// 		// i can:  find whre it leads
+	// 		graphArr.forEach(state => {
+	// 			if (state.label === this.transitions[transitionBit]) {
+	// 				return state.next2(testString.slice(1), graphArr);
+	// 			}
+	// 		});
+	// 	}
+	// 	// i can't:  return false
+	// 	return -1;
+	// }
 }
