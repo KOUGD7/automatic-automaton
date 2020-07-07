@@ -19,8 +19,10 @@ import {
 	IonFooter,
 	IonList,
 	IonListHeader,
+	IonModal,
 } from '@ionic/react';
 import './TweakParams.css';
+import Simulator from './Simulator';
 
 interface TweakParamsProps {
 	photo: Photo;
@@ -40,6 +42,8 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 
 	const [minRadius, setMinRadius] = useState(0);
 	const [maxRadius, setMaxRadius] = useState(0);
+
+	const [showModal, setShowModal] = useState(false);
 
 	const { prepareForm } = usePhotoUpload();
 
@@ -67,9 +71,6 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 		setSentFirstPic(true);
 	};
 
-	useEffect(() => {
-		console.log('created tweak params');
-	}, []);
 	return (
 		<IonPage>
 			<IonHeader>
@@ -93,7 +94,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 						<IonRange
 							min={0}
 							step={1}
-							max={300}
+							max={500}
 							value={maxArea}
 							onIonChange={e => setMaxArea(e.detail.value as number)}
 						>
@@ -171,6 +172,9 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 						</IonRange>
 					</IonItem>
 				</IonList>
+				<IonModal isOpen={showModal}>
+					<Simulator photoName={photo.filepath} />
+				</IonModal>
 			</IonContent>
 			<IonFooter>
 				<IonButton
@@ -180,7 +184,11 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 				>
 					{sentFirstPic ? 'Tweak Image' : 'Send Photo'}
 				</IonButton>
-				<IonButton expand="block" fill="solid" onClick={() => {}}>
+				<IonButton
+					expand="block"
+					fill="solid"
+					onClick={() => setShowModal(true)}
+				>
 					Ready to Get Graph
 				</IonButton>
 			</IonFooter>
