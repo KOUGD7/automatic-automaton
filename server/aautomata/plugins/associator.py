@@ -68,10 +68,8 @@ class BaseAssociator(Associator):
                     o_labels.remove(label)
 
         # create an unconnected graph out of the labelled states
-        graph = {}
         for state in o_states:
             label_hash = hash(str(get_label(state)))
-            graph[label_hash] = state
 
         # associate labels and transitions
         for transition in o_transitions:
@@ -114,7 +112,11 @@ class BaseAssociator(Associator):
             else:
                 root = hash(str(get_label(state)))
 
-        return root, graph
+        # change all the state labels to be hashed versions
+        for state in o_states:
+            state['label'] = hash(str(state['label']))
+
+        return root, o_states
 
     @ staticmethod
     def associate(states, transitions, labels, original_img=None):
