@@ -22,7 +22,7 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName }) => {
 	useEffect(() => {
 		// send api call
 		(async () => {
-			const resp = await API.post('/associate-features/' + photoName);
+			const resp = await API.get('/associate-features/' + photoName);
 			const graph: GraphResponse = resp.data;
 
 			// convert resp into stateList
