@@ -56,10 +56,10 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	});
 
 	const [recCoords, setRecCoords] = useState<RectCoords>({
-		topR: { x: rec.x, y: rec.y },
-		topL: { x: rec.x + rec.width, y: rec.y },
-		bottomR: { x: rec.x, y: rec.y + rec.height },
-		bottomL: { x: rec.x + rec.width, y: rec.y + rec.height },
+		topL: { x: rec.x, y: rec.y },
+		topR: { x: rec.x + rec.width, y: rec.y },
+		bottomL: { x: rec.x, y: rec.y + rec.height },
+		bottomR: { x: rec.x + rec.width, y: rec.y + rec.height },
 	});
 
 	useEffect(() => {
@@ -136,20 +136,21 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 					stroke: 'red',
 				});
 				setRecCoords({
-					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
 					topL: { x: recCoords.topL.x, y: recCoords.topL.y },
-					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
 					bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
+					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
 				});
 			} else {
 				setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
 				setRecCoords({
-					topR: { x: x, y: y },
-					topL: { x: x + rw, y: y },
-					bottomR: { x: x, y: y + rh },
-					bottomL: { x: x + rw, y: y + rh },
+					topL: { x: x, y: y },
+					topR: { x: x + rw, y: y },
+					bottomL: { x: x, y: y + rh },
+					bottomR: { x: x + rw, y: y + rh },
 				});
 			}
+			// console.log(recCoords);
 
 			layer.batchDraw();
 		}
@@ -182,6 +183,7 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 
 		rect.on('transformend', function () {
 			console.log('transform end');
+			// console.log(recCoords);
 		});
 
 		// Deselects the rectangle by removing the rectangle from the transformer
@@ -213,21 +215,21 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 					stroke: 'red',
 				});
 				setRecCoords({
-					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
 					topL: { x: recCoords.topL.x, y: recCoords.topL.y },
-					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
 					bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
+					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
 				});
 			} else {
 				setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
 				setRecCoords({
-					topR: { x: x, y: y },
-					topL: { x: x + rw, y: y },
-					bottomR: { x: x, y: y + rh },
-					bottomL: { x: x + rw, y: y + rh },
+					topL: { x: x, y: y },
+					topR: { x: x + rw, y: y },
+					bottomL: { x: x, y: y + rh },
+					bottomR: { x: x + rw, y: y + rh },
 				});
 			}
-
+			// console.log(recCoords);
 			layer.batchDraw();
 		}
 	};
@@ -256,20 +258,21 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 				stroke: 'red',
 			});
 			setRecCoords({
-				topR: { x: recCoords.topR.x, y: recCoords.topR.y },
 				topL: { x: recCoords.topL.x, y: recCoords.topL.y },
-				bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+				topR: { x: recCoords.topR.x, y: recCoords.topR.y },
 				bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
+				bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
 			});
 		} else {
 			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
 			setRecCoords({
-				topR: { x: x, y: y },
-				topL: { x: x + rw, y: y },
-				bottomR: { x: x, y: y + rh },
-				bottomL: { x: x + rw, y: y + rh },
+				topL: { x: x, y: y },
+				topR: { x: x + rw, y: y },
+				bottomL: { x: x, y: y + rh },
+				bottomR: { x: x + rw, y: y + rh },
 			});
 		}
+		// console.log(recCoords);
 	};
 
 	return (
