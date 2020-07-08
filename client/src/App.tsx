@@ -7,7 +7,6 @@ import { IonReactRouter } from '@ionic/react-router';
 import Home from './pages/Home';
 import Alphabet from './pages/SelectAlphabet';
 import TweakParams from './pages/TweakParams';
-import Simulator from './pages/Simulator';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
@@ -35,8 +34,7 @@ const App: React.FC = () => (
 				<Route path="/home" component={Home} />
 				<Route path="/alphabet" component={Alphabet} />
 				<Route path="/params" component={TweakParams} />
-				<Route path="/simulator" component={Simulator} />
-				<Redirect exact from="/" to="/simulator" />
+				<Redirect exact from="/" to="/home" />
 			</IonRouterOutlet>
 		</IonReactRouter>
 	</IonApp>

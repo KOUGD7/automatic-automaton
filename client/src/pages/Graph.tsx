@@ -12,7 +12,7 @@ import Sketch from 'react-p5';
 // import { push, triangle } from 'ionicons/icons';
 // import { Circle } from 'react-konva';
 
-const Simulator: React.FC = () => {
+const Graph: React.FC = () => {
 	const data = {
 		"root": -6090941084780165905,
 		"graph":
@@ -346,4 +346,4 @@ const Simulator: React.FC = () => {
 	);
 };
 
-export default Simulator;
+export default Graph;
