@@ -39,7 +39,6 @@ export interface Graph {
 }
 
 export class State {
-	private _is_root: boolean = false;
 	label: number;
 	centre: number[];
 	radius: number;
@@ -60,14 +59,6 @@ export class State {
 		this.transitions = transitions;
 	}
 
-	set is_root(bool: boolean) {
-		this.is_root = bool;
-	}
-
-	get is_root() {
-		return this._is_root;
-	}
-
 	/**
 	 * This method checks for the next state to move to and returns its
 	 * corresponding label. If none is found, it returns -1.
@@ -76,17 +67,20 @@ export class State {
 	 */
 	next(transitionBitString: string, graphArr: State[]): number {
 		// check if i can transition on the bit
+
 		let transitionBit = parseInt(transitionBitString, 10);
+		let nextState = -1;
 		if (this.transitions.hasOwnProperty(transitionBit)) {
 			// i can:  find whre it leads
 			graphArr.forEach(state => {
 				if (state.label === this.transitions[transitionBit]) {
-					return this.transitions[transitionBit];
+					nextState = this.transitions[transitionBit];
+					// return this.transitions[transitionBit];
 				}
 			});
 		}
 		// i can't:  return false
-		return -1;
+		return nextState;
 	}
 
 	// next2(testString: string, graphArr: State[]) {
