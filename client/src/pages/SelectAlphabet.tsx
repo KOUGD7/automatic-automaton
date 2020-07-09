@@ -289,7 +289,8 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 				<IonCard>
 					<IonCardHeader>
 						<IonCardSubtitle>
-							Draw a box around the alphabet in the image
+							Move and resize the box so that it sorrounds the alphabet in the
+							picture
 						</IonCardSubtitle>
 					</IonCardHeader>
 				</IonCard>
