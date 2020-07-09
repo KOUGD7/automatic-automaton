@@ -94,34 +94,6 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 				<RadiusSliders /> */}
 
 				<IonList>
-					<IonListHeader>Area (Labels)</IonListHeader>
-					<IonItem>
-						<IonRange
-							min={0}
-							step={1}
-							max={1000}
-							value={maxArea}
-							onIonChange={e => setMaxArea(e.detail.value as number)}
-						>
-							<IonLabel slot="start">Max:</IonLabel>
-							<IonLabel slot="end">{maxArea}</IonLabel>
-						</IonRange>
-					</IonItem>
-					<IonItem>
-						<IonRange
-							min={0}
-							step={1}
-							max={300}
-							value={minArea}
-							onIonChange={e => setMinArea(e.detail.value as number)}
-						>
-							<IonLabel slot="start">Min:</IonLabel>
-							<IonLabel slot="end">{minArea}</IonLabel>
-						</IonRange>
-					</IonItem>
-				</IonList>
-
-				<IonList>
 					<IonListHeader>Radius (States)</IonListHeader>
 					<IonItem>
 						<IonRange
@@ -147,10 +119,6 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 							<IonLabel slot="end">{minRadius}</IonLabel>
 						</IonRange>
 					</IonItem>
-				</IonList>
-
-				<IonList>
-					<IonListHeader>Other</IonListHeader>
 					<IonItem>
 						<IonRange
 							min={0}
@@ -163,7 +131,34 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 							<IonLabel slot="end">{quality}</IonLabel>
 						</IonRange>
 					</IonItem>
+				</IonList>
 
+				<IonList>
+					<IonListHeader>Area (Labels)</IonListHeader>
+					<IonItem>
+						<IonRange
+							min={0}
+							step={1}
+							max={1000}
+							value={maxArea}
+							onIonChange={e => setMaxArea(e.detail.value as number)}
+						>
+							<IonLabel slot="start">Max:</IonLabel>
+							<IonLabel slot="end">{maxArea}</IonLabel>
+						</IonRange>
+					</IonItem>
+					<IonItem>
+						<IonRange
+							min={0}
+							step={1}
+							max={300}
+							value={minArea}
+							onIonChange={e => setMinArea(e.detail.value as number)}
+						>
+							<IonLabel slot="start">Min:</IonLabel>
+							<IonLabel slot="end">{minArea}</IonLabel>
+						</IonRange>
+					</IonItem>
 					<IonItem>
 						<IonRange
 							min={0}
@@ -177,6 +172,10 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 						</IonRange>
 					</IonItem>
 				</IonList>
+
+				{/* <IonList>
+					<IonListHeader>Other</IonListHeader>
+				</IonList> */}
 				<IonModal isOpen={showModal}>
 					<Simulator
 						closeModal={closeModal}
