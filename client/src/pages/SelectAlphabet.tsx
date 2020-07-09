@@ -280,7 +280,7 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			<IonHeader>
 				<IonToolbar>
 					<IonButtons slot="start">
-						<IonBackButton />
+						<IonBackButton defaultHref="/home" />
 					</IonButtons>
 					<IonTitle>Select Alphabet</IonTitle>
 				</IonToolbar>
