@@ -14,21 +14,19 @@ import {
 	IonFab,
 	IonFabButton,
 	IonIcon,
+	IonLabel,
 } from '@ionic/react';
 
 import { RouteComponentProps } from 'react-router';
 
-import {
-	camera,
-	bulb,
-	chevronDownOutline,
-	chevronUpOutline,
-} from 'ionicons/icons';
+import { camera, chevronDownOutline, chevronUpOutline } from 'ionicons/icons';
 import { useCameraPhoto } from '../hooks/useCameraPhoto';
+import useFileUpload from '../hooks/useFileUpload';
 
 import './Home.css';
 
 const Home: React.FC<RouteComponentProps> = props => {
+	const [filePhoto, FileUpload] = useFileUpload();
 	const { photo, takePhoto } = useCameraPhoto();
 	const [tips, setTips] = useState<boolean>(true);
 	const [content, setContent] = useState<boolean>(false);
@@ -36,12 +34,20 @@ const Home: React.FC<RouteComponentProps> = props => {
 	let hide_cam = false;
 	let hide = true;
 
-	if (photo) {
+	if (photo || filePhoto) {
 		hide_cam = true;
 		hide = false;
 		// setTips(false);
 		// setContent(true);
 	}
+
+	const sendPhoto = () => {
+		if (photo) {
+			props.history.push('/alphabet', { photo: photo });
+		} else {
+			props.history.push('/alphabet', { photo: filePhoto });
+		}
+	};
 
 	return (
 		<IonPage>
@@ -98,8 +104,9 @@ const Home: React.FC<RouteComponentProps> = props => {
 				</IonCard>
 				<IonCard>
 					{photo && <IonImg src={photo.base64 ?? photo.webviewPath} />}
+					{filePhoto && <IonImg src={filePhoto.webviewPath} />}
 				</IonCard>
-
+				<FileUpload />
 				<IonFab
 					hidden={hide_cam}
 					vertical="bottom"
@@ -122,11 +129,7 @@ const Home: React.FC<RouteComponentProps> = props => {
 				</IonFab>
 
 				<IonFab hidden={hide} vertical="bottom" horizontal="end" slot="fixed">
-					<IonButton
-						onClick={() => props.history.push('/alphabet', { photo: photo })}
-					>
-						Continue
-					</IonButton>
+					<IonButton onClick={sendPhoto}>Continue</IonButton>
 				</IonFab>
 			</IonContent>
 		</IonPage>
