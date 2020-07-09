@@ -38,7 +38,7 @@ export function usePhotoUpload() {
 				let blob: Blob = new Blob(
 					[new Uint8Array(reader.result as ArrayBuffer)],
 					{
-						type: 'image/jpeg',
+						type: file.type,
 					}
 				);
 
