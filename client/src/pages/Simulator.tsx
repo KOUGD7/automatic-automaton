@@ -24,13 +24,13 @@ interface SimulatorPage {
 	img: string;
 }
 
-const stringsToTest = ['000000', '111111', '111101', '1111010', '010100'];
+// const stringsToTest = ['000000', '111111', '111101', '1111010', '010100'];
 
 const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal, img }) => {
 	const [root, setRoot] = useState<State>();
 	const [stateList, setStateList] = useState<State[]>([]);
 	const [strInput, setStrInput] = useState<string>('');
-	const [testStrings, setTestStrings] = useState<string[]>(stringsToTest);
+	const [testStrings, setTestStrings] = useState<string[]>([]);
 	const [simResponses, setSimResponses] = useState<SimulationResponse[]>([]);
 
 	useEffect(() => {
@@ -86,11 +86,9 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal, img }) => {
 				if (length - (index + 1) > 0) {
 					// check if there are more bits to process, therefore fail
 					return { was_accepted: false, stop_state: currentState.label };
-				} else if (!currentState.is_accepting) {
+				} else {
 					// no more bits to process
 					return { was_accepted: false, stop_state: currentState.label };
-				} else {
-					return { was_accepted: true };
 				}
 			} else {
 				currentState = stateList.find(s => s.label === next);
