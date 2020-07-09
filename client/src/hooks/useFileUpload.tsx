@@ -24,7 +24,7 @@ export function useFileUpload(): [Photo | null, React.FC] {
 			} catch (error) {}
 		};
 		return (
-			<IonButton>
+			<IonButton expand="full">
 				<IonLabel slot="end">Upload Image</IonLabel>
 				<input
 					type="file"

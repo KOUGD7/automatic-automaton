@@ -36,10 +36,10 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal, img }) => {
 	useEffect(() => {
 		// send api call
 		(async () => {
-			// const resp = await API.get('/associate-features/' + photoName);
-			// const graph: GraphResponse = resp.data;
+			const resp = await API.get('/associate-features/' + photoName);
+			const graph: GraphResponse = resp.data;
 
-			const graph: GraphResponse = data;
+			// const graph: GraphResponse = data;
 
 			// convert resp into stateList
 			let stateArr: State[] = graph.graph.map(g => {
