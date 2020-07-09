@@ -20,6 +20,7 @@ import {
 	IonList,
 	IonListHeader,
 	IonModal,
+	IonIcon,
 } from '@ionic/react';
 import './TweakParams.css';
 import Simulator from './Simulator';
@@ -80,7 +81,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 			<IonHeader>
 				<IonToolbar>
 					<IonButtons slot="start">
-						<IonBackButton />
+						<IonBackButton defaultHref="/home" />
 					</IonButtons>
 					<IonTitle>Tweak Parameter</IonTitle>
 				</IonToolbar>
@@ -93,7 +94,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 				<RadiusSliders /> */}
 
 				<IonList>
-					<IonListHeader>Area</IonListHeader>
+					<IonListHeader>Area (Labels)</IonListHeader>
 					<IonItem>
 						<IonRange
 							min={0}
@@ -121,7 +122,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 				</IonList>
 
 				<IonList>
-					<IonListHeader>Radius</IonListHeader>
+					<IonListHeader>Radius (States)</IonListHeader>
 					<IonItem>
 						<IonRange
 							min={0}
@@ -158,7 +159,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 							value={quality}
 							onIonChange={e => setQuality(e.detail.value as number)}
 						>
-							<IonLabel slot="start">Quality</IonLabel>
+							<IonLabel slot="start">Circle Quality</IonLabel>
 							<IonLabel slot="end">{quality}</IonLabel>
 						</IonRange>
 					</IonItem>
