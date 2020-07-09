@@ -177,7 +177,11 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 					</IonItem>
 				</IonList>
 				<IonModal isOpen={showModal}>
-					<Simulator closeModal={closeModal} photoName={photo.filepath} />
+					<Simulator
+						closeModal={closeModal}
+						photoName={photo.filepath}
+						img={img}
+					/>
 				</IonModal>
 			</IonContent>
 			<IonFooter>

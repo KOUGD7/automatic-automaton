@@ -10,6 +10,8 @@ import {
 	IonIcon,
 	IonItem,
 	IonTextarea,
+	IonFooter,
+	IonCard,
 } from '@ionic/react';
 import { GraphResponse, State, SimulationResponse } from '../models';
 import API from '../api';
@@ -19,11 +21,12 @@ import { close } from 'ionicons/icons';
 interface SimulatorPage {
 	photoName: string;
 	closeModal(): void;
+	img: string;
 }
 
 const stringsToTest = ['000000', '111111', '111101', '1111010', '010100'];
 
-const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
+const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal, img }) => {
 	const [root, setRoot] = useState<State>();
 	const [stateList, setStateList] = useState<State[]>([]);
 	const [strInput, setStrInput] = useState<string>('');
@@ -133,6 +136,9 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 				</IonToolbar>
 			</IonHeader>
 			<IonContent className="ion-padding">
+				<IonCard>
+					<img src={img} alt="Image to be processed" />
+				</IonCard>
 				<section>
 					<h2>Results</h2>
 					<ul>
@@ -162,17 +168,20 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 							onIonChange={e => setStrInput(e.detail.value!)}
 						></IonTextarea>
 					</IonItem>
-					<IonButton expand="block" onClick={addTestStrings}>
-						Add list
-					</IonButton>
-					<IonButton expand="block" onClick={() => setTestStrings([])}>
-						Clear All
-					</IonButton>
 				</section>
+			</IonContent>
+			<IonFooter>
+				<IonButton expand="block" onClick={addTestStrings}>
+					Add list
+				</IonButton>
+				<IonButton expand="block" onClick={() => setTestStrings([])}>
+					Clear All
+				</IonButton>
+
 				<IonButton expand="block" fill="outline" onClick={runSimulation}>
 					Run SImulation
 				</IonButton>
-			</IonContent>
+			</IonFooter>
 		</IonPage>
 	);
 };
