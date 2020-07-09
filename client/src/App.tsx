@@ -26,6 +26,7 @@ import '@ionic/react/css/display.css';
 
 /* Theme variables */
 import './theme/variables.css';
+import Graph from './pages/Graph';
 
 const App: React.FC = () => (
 	<IonApp>
@@ -34,6 +35,7 @@ const App: React.FC = () => (
 				<Route path="/home" component={Home} />
 				<Route path="/alphabet" component={Alphabet} />
 				<Route path="/params" component={TweakParams} />
+				<Route path="/graph" component={Graph} />
 				<Redirect exact from="/" to="/home" />
 			</IonRouterOutlet>
 		</IonReactRouter>

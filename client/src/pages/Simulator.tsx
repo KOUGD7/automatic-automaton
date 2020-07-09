@@ -15,6 +15,7 @@ import { GraphResponse, State, SimulationResponse } from '../models';
 import API from '../api';
 import data from '../assets/response.json';
 import { close } from 'ionicons/icons';
+import Sketch from 'react-p5';
 
 interface SimulatorPage {
 	photoName: string;
@@ -29,6 +30,7 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 	const [strInput, setStrInput] = useState<string>('');
 	const [testStrings, setTestStrings] = useState<string[]>(stringsToTest);
 	const [simResponses, setSimResponses] = useState<SimulationResponse[]>([]);
+	const [drawnStates, setDrawnStates] = useState<any[]>([]);
 
 	useEffect(() => {
 		// send api call
@@ -50,6 +52,91 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 			// draw states and transitions
 		})();
 	}, []);
+
+	const setup = async (p5: any, canvasParentRef: any) => {
+		let width = window.innerWidth;
+		let height = Math.round(window.innerHeight / 2);
+		const labelOffset: number = 9;
+
+		p5.createCanvas(width, height).parent(canvasParentRef);
+
+		// stateList.forEach(state => {
+		// 	state.draw();
+		// });
+
+		let newArr: P5State[] = stateList.map(s => {
+			const { label, centre, is_accepting, radius } = s;
+			const isStartState = root?.label === label;
+			return new P5State(
+				p5,
+				label,
+				centre[0],
+				centre[1],
+				radius,
+				isStartState,
+				is_accepting
+			);
+		});
+		setDrawnStates(newArr);
+		newArr.forEach(s => s.draw());
+
+		class P5State {
+			isAccepting: boolean = false;
+			isStartState: boolean = false;
+			label: string = '';
+			x: number = 0;
+			y: number = 0;
+			radius: number = 0;
+			center: any = null;
+			p5: any = null;
+
+			constructor(
+				p5: any,
+				label: any,
+				x: any,
+				y: any,
+				radius: any,
+				isStartState: any,
+				isAccepting: any
+			) {
+				this.isAccepting = isAccepting;
+				this.isStartState = isStartState;
+				this.label = label;
+				this.center = p5.createVector(x, y);
+				this.radius = radius;
+				this.p5 = p5;
+			}
+
+			draw() {
+				// draws the arrow
+				const { x, y } = this.center;
+				const arrowWidth = 7;
+				if (this.isStartState) {
+					this.p5.push();
+					this.p5.fill(51);
+					let start = x - this.radius;
+					this.p5.line(x - this.radius * 2, y, start, y);
+					this.p5.triangle(
+						start,
+						y,
+						start - arrowWidth,
+						y - arrowWidth,
+						start - arrowWidth,
+						y + arrowWidth
+					);
+					this.p5.pop();
+				}
+				this.p5.circle(x, y, this.radius * 2);
+
+				if (this.isAccepting) {
+					// draw inner circle
+					this.p5.circle(x, y, (this.radius - 5) * 2);
+				}
+
+				this.p5.text(this.label, x - labelOffset, y + labelOffset);
+			}
+		}
+	};
 
 	const runSimulation = () => {
 		setSimResponses([]);
@@ -133,6 +220,10 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 				</IonToolbar>
 			</IonHeader>
 			<IonContent className="ion-padding">
+				<section>
+					<h2>sketch</h2>
+					<Sketch setup={setup} />
+				</section>
 				<section>
 					<h2>Results</h2>
 					<ul>
