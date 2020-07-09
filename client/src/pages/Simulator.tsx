@@ -8,6 +8,8 @@ import {
 	IonButton,
 	IonButtons,
 	IonIcon,
+	IonItem,
+	IonTextarea,
 } from '@ionic/react';
 import { GraphResponse, State, SimulationResponse } from '../models';
 import API from '../api';
@@ -24,6 +26,7 @@ const stringsToTest = ['000000', '111111', '111101', '1111010', '010100'];
 const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 	const [root, setRoot] = useState<State>();
 	const [stateList, setStateList] = useState<State[]>([]);
+	const [strInput, setStrInput] = useState<string>('');
 	const [testStrings, setTestStrings] = useState<string[]>(stringsToTest);
 	const [simResponses, setSimResponses] = useState<SimulationResponse[]>([]);
 
@@ -104,6 +107,19 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 		return { was_accepted: false, stop_state: currentState.label };
 	};
 
+	const addTestStrings = () => {
+		console.log(strInput?.split('\n'));
+
+		setTestStrings(old => old.concat(strInput.split('\n')));
+		setStrInput('');
+	};
+
+	const onDeleteString = (index: number) => {
+		let remaining = [...testStrings];
+		remaining.splice(index, 1);
+		setTestStrings(remaining);
+	};
+
 	return (
 		<IonPage>
 			<IonHeader>
@@ -116,8 +132,8 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 					</IonButtons>
 				</IonToolbar>
 			</IonHeader>
-			<IonContent>
-				<div>
+			<IonContent className="ion-padding">
+				<section>
 					<h2>Results</h2>
 					<ul>
 						{simResponses.map((sr, index) => (
@@ -127,8 +143,35 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 							</li>
 						))}
 					</ul>
-				</div>
-				<IonButton onClick={runSimulation}>Run SImulation</IonButton>
+				</section>
+				<section>
+					<h2>Inputs</h2>
+					<ul>
+						{testStrings.map((ts, index) => (
+							<li key={index}>
+								{index}: {ts}{' '}
+								<button onClick={() => onDeleteString(index)}>x</button>
+							</li>
+						))}
+					</ul>
+					<IonItem>
+						<IonTextarea
+							placeholder="Enter more information here..."
+							rows={5}
+							value={strInput}
+							onIonChange={e => setStrInput(e.detail.value!)}
+						></IonTextarea>
+					</IonItem>
+					<IonButton expand="block" onClick={addTestStrings}>
+						Add list
+					</IonButton>
+					<IonButton expand="block" onClick={() => setTestStrings([])}>
+						Clear All
+					</IonButton>
+				</section>
+				<IonButton expand="block" fill="outline" onClick={runSimulation}>
+					Run SImulation
+				</IonButton>
 			</IonContent>
 		</IonPage>
 	);
