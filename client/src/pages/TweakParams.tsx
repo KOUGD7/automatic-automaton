@@ -71,6 +71,10 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 		setSentFirstPic(true);
 	};
 
+	const closeModal = () => {
+		setShowModal(false);
+	};
+
 	return (
 		<IonPage>
 			<IonHeader>
@@ -94,7 +98,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 						<IonRange
 							min={0}
 							step={1}
-							max={500}
+							max={1000}
 							value={maxArea}
 							onIonChange={e => setMaxArea(e.detail.value as number)}
 						>
@@ -122,7 +126,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 						<IonRange
 							min={0}
 							step={1}
-							max={300}
+							max={1000}
 							value={maxRadius}
 							onIonChange={e => setMaxRadius(e.detail.value as number)}
 						>
@@ -150,7 +154,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 						<IonRange
 							min={0}
 							max={1}
-							step={0.1}
+							step={0.01}
 							value={quality}
 							onIonChange={e => setQuality(e.detail.value as number)}
 						>
@@ -173,7 +177,7 @@ const TweakParams: React.FC<TweakParamsProps> = ({ photo, rectCoords }) => {
 					</IonItem>
 				</IonList>
 				<IonModal isOpen={showModal}>
-					<Simulator photoName={photo.filepath} />
+					<Simulator closeModal={closeModal} photoName={photo.filepath} />
 				</IonModal>
 			</IonContent>
 			<IonFooter>

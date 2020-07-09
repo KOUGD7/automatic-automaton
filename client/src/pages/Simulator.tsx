@@ -6,18 +6,22 @@ import {
 	IonTitle,
 	IonContent,
 	IonButton,
+	IonButtons,
+	IonIcon,
 } from '@ionic/react';
 import { GraphResponse, State, SimulationResponse } from '../models';
 import API from '../api';
 import data from '../assets/response.json';
+import { close } from 'ionicons/icons';
 
 interface SimulatorPage {
 	photoName: string;
+	closeModal(): void;
 }
 
 const stringsToTest = ['000000', '111111', '111101', '1111010', '010100'];
 
-const Simulator: React.FC<SimulatorPage> = ({ photoName }) => {
+const Simulator: React.FC<SimulatorPage> = ({ photoName, closeModal }) => {
 	const [root, setRoot] = useState<State>();
 	const [stateList, setStateList] = useState<State[]>([]);
 	const [testStrings, setTestStrings] = useState<string[]>(stringsToTest);
@@ -26,10 +30,10 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName }) => {
 	useEffect(() => {
 		// send api call
 		(async () => {
-			// const resp = await API.get('/associate-features/' + photoName);
-			// const graph: GraphResponse = resp.data;
+			const resp = await API.get('/associate-features/' + photoName);
+			const graph: GraphResponse = resp.data;
 
-			const graph: GraphResponse = data;
+			// const graph: GraphResponse = data;
 
 			// convert resp into stateList
 			let stateArr: State[] = graph.graph.map(g => {
@@ -105,6 +109,11 @@ const Simulator: React.FC<SimulatorPage> = ({ photoName }) => {
 			<IonHeader>
 				<IonToolbar>
 					<IonTitle>Simulator</IonTitle>
+					<IonButtons slot="primary">
+						<IonButton onClick={closeModal}>
+							<IonIcon slot="icon-only" icon={close}></IonIcon>
+						</IonButton>
+					</IonButtons>
 				</IonToolbar>
 			</IonHeader>
 			<IonContent>
