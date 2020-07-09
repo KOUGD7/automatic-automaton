@@ -56,10 +56,10 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 	});
 
 	const [recCoords, setRecCoords] = useState<RectCoords>({
-		topR: { x: rec.x, y: rec.y },
-		topL: { x: rec.x + rec.width, y: rec.y },
-		bottomR: { x: rec.x, y: rec.y + rec.height },
-		bottomL: { x: rec.x + rec.width, y: rec.y + rec.height },
+		topL: { x: rec.x, y: rec.y },
+		topR: { x: rec.x + rec.width, y: rec.y },
+		bottomL: { x: rec.x, y: rec.y + rec.height },
+		bottomR: { x: rec.x + rec.width, y: rec.y + rec.height },
 	});
 
 	useEffect(() => {
@@ -118,16 +118,39 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 		function updateRect() {
 			let x = rect.x();
 			let y = rect.y();
-			let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
-			let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
-			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
-			setRecCoords({
-				topR: { x: x, y: y },
-				topL: { x: x + rw, y: y },
-				bottomR: { x: x, y: y + rh },
-				bottomL: { x: x + rw, y: y + rh },
-			});
-			console.log(recCoords);
+
+			let scaleX = rect.scaleX();
+			let scaleY = rect.scaleY();
+			rect.scaleX(1);
+			rect.scaleY(1);
+
+			let rw = Math.round(Math.max(5, rect.width() * scaleX));
+			let rh = Math.round(Math.max(rect.height() * scaleY));
+
+			if (rw < 5 || rh < 5 || rw > stage.width || rh > stage.height) {
+				setRec({
+					x: rec.x,
+					y: rec.y,
+					width: rec.width,
+					height: rec.height,
+					stroke: 'red',
+				});
+				setRecCoords({
+					topL: { x: recCoords.topL.x, y: recCoords.topL.y },
+					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
+					bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
+					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+				});
+			} else {
+				setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+				setRecCoords({
+					topL: { x: x, y: y },
+					topR: { x: x + rw, y: y },
+					bottomL: { x: x, y: y + rh },
+					bottomR: { x: x + rw, y: y + rh },
+				});
+			}
+			// console.log(recCoords);
 
 			layer.batchDraw();
 		}
@@ -160,6 +183,7 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 
 		rect.on('transformend', function () {
 			console.log('transform end');
+			// console.log(recCoords);
 		});
 
 		// Deselects the rectangle by removing the rectangle from the transformer
@@ -173,33 +197,82 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 		function updateRect() {
 			let x = rect.x();
 			let y = rect.y();
-			let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
-			let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
-			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
-			setRecCoords({
-				topR: { x: x, y: y },
-				topL: { x: x + rw, y: y },
-				bottomR: { x: x, y: y + rh },
-				bottomL: { x: x + rw, y: y + rh },
-			});
 
+			let scaleX = rect.scaleX();
+			let scaleY = rect.scaleY();
+			rect.scaleX(1);
+			rect.scaleY(1);
+
+			let rw = Math.round(Math.max(5, rect.width() * scaleX));
+			let rh = Math.round(Math.max(rect.height() * scaleY));
+
+			if (rw < 5 || rh < 5 || rw > stage.width || rh > stage.height) {
+				setRec({
+					x: rec.x,
+					y: rec.y,
+					width: rec.width,
+					height: rec.height,
+					stroke: 'red',
+				});
+				setRecCoords({
+					topL: { x: recCoords.topL.x, y: recCoords.topL.y },
+					topR: { x: recCoords.topR.x, y: recCoords.topR.y },
+					bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
+					bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+				});
+			} else {
+				setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+				setRecCoords({
+					topL: { x: x, y: y },
+					topR: { x: x + rw, y: y },
+					bottomL: { x: x, y: y + rh },
+					bottomR: { x: x + rw, y: y + rh },
+				});
+			}
+			// console.log(recCoords);
 			layer.batchDraw();
 		}
 	};
 
 	const handleDragMove = (evt: KonvaEventObject<DragEvent>) => {
 		let rect = evt.currentTarget;
+		let stage = evt.target.getLayer().getStage();
+
 		let x = rect.x();
 		let y = rect.y();
-		let rw = Math.round(Math.max(5, rect.width() * rect.scaleX()));
-		let rh = Math.round(Math.max(rect.height() * rect.scaleY()));
-		setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
-		setRecCoords({
-			topR: { x: x, y: y },
-			topL: { x: x + rw, y: y },
-			bottomR: { x: x, y: y + rh },
-			bottomL: { x: x + rw, y: y + rh },
-		});
+
+		let scaleX = rect.scaleX();
+		let scaleY = rect.scaleY();
+		rect.scaleX(1);
+		rect.scaleY(1);
+
+		let rw = Math.round(Math.max(5, rect.width() * scaleX));
+		let rh = Math.round(Math.max(rect.height() * scaleY));
+
+		if (rw < 5 || rh < 5 || rw > stage.width || rh > stage.height) {
+			setRec({
+				x: rec.x,
+				y: rec.y,
+				width: rec.width,
+				height: rec.height,
+				stroke: 'red',
+			});
+			setRecCoords({
+				topL: { x: recCoords.topL.x, y: recCoords.topL.y },
+				topR: { x: recCoords.topR.x, y: recCoords.topR.y },
+				bottomL: { x: recCoords.bottomL.x, y: recCoords.bottomL.y },
+				bottomR: { x: recCoords.bottomR.x, y: recCoords.bottomR.y },
+			});
+		} else {
+			setRec({ x: x, y: y, width: rw, height: rh, stroke: 'red' });
+			setRecCoords({
+				topL: { x: x, y: y },
+				topR: { x: x + rw, y: y },
+				bottomL: { x: x, y: y + rh },
+				bottomR: { x: x + rw, y: y + rh },
+			});
+		}
+		// console.log(recCoords);
 	};
 
 	return (
@@ -207,7 +280,7 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 			<IonHeader>
 				<IonToolbar>
 					<IonButtons slot="start">
-						<IonBackButton />
+						<IonBackButton defaultHref="/home" />
 					</IonButtons>
 					<IonTitle>Select Alphabet</IonTitle>
 				</IonToolbar>
@@ -216,7 +289,8 @@ const SelectAlphabet: React.FC<RouteComponentProps> = props => {
 				<IonCard>
 					<IonCardHeader>
 						<IonCardSubtitle>
-							Draw a box around the alphabet in the image
+							Move and resize the box so that it sorrounds the alphabet in the
+							picture
 						</IonCardSubtitle>
 					</IonCardHeader>
 				</IonCard>

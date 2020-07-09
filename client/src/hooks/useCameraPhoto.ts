@@ -44,8 +44,10 @@ export function useCameraPhoto() {
 		try {
 			const cameraPhoto = await getPhoto({
 				resultType: CameraResultType.Uri,
-				source: CameraSource.Camera,
+				source: CameraSource.Prompt,
 				quality: 100,
+				height: 480,
+				width: 600,
 			});
 
 			const fileName = new Date().getTime() + '.jpeg';

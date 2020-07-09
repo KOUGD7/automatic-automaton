@@ -307,7 +307,7 @@ def compare_labels(alpha1, label1):
 class BaseAlphabetDetector(Detector):
 
     @staticmethod
-    def detect(labels, alphabet, alpharange, original_img=None):
+    def detect(labels, alphabet, alpharange, original_img=None, is_testing=False):
         """Detects the alphabet"""
 
         l_rects, l_centroids, _, l_img = labels
@@ -360,6 +360,7 @@ class BaseAlphabetDetector(Detector):
             new_rects.append((alpha_index, rect_s))
             count_sub_images += 1
 
-        cv.imshow('ConnectLabels', l_img)
-        cv.imshow('ConnectAlphabet', a_img)
+        if original_img is not None and is_testing:
+            cv.imshow('ConnectLabels', l_img)
+            cv.imshow('ConnectAlphabet', a_img)
         return mapping, new_rects

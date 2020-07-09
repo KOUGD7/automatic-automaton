@@ -1,18 +1,7 @@
 import { Photo, RectCoords, Coords } from '../models';
 import API from '../api.js';
 
-export function usePhotoUpload(): {
-	prepareForm(
-		photo: Photo,
-		coords: RectCoords,
-		min_radius: number,
-		max_radius: number,
-		min_area: number,
-		max_area: number,
-		quality: number,
-		max_alpha: number
-	): Promise<FormData>;
-} {
+export function usePhotoUpload() {
 	const prepareForm = async (
 		photo: Photo,
 		coords: any,
@@ -41,12 +30,48 @@ export function usePhotoUpload(): {
 		return formData;
 	};
 
+	const fileToBlob = async (file: any) => {
+		return new Promise((res, rej) => {
+			let reader = new FileReader();
+			reader.readAsArrayBuffer(file);
+			reader.onload = () => {
+				let blob: Blob = new Blob(
+					[new Uint8Array(reader.result as ArrayBuffer)],
+					{
+						type: file.type,
+					}
+				);
+
+				res(URL.createObjectURL(blob));
+			};
+			reader.onerror = () => rej();
+		});
+	};
+
+	const fileToBase64 = async (file: any) => {
+		return new Promise((res, rej) => {
+			let reader = new FileReader();
+			reader.readAsDataURL(file);
+			reader.onload = () => {
+				res(reader.result as string);
+			};
+			reader.onerror = () => rej();
+		});
+	};
+
 	const convertToBlob = async (photo: any) => {
-		const blob = await fetch(photo.webviewPath).then(r => r.blob());
-		return blob;
+		const blob = await fetch(photo.webviewPath);
+		console.log('blob: ', blob);
+
+		const r = await blob.blob();
+		console.log('r', r);
+
+		return r;
 	};
 
 	return {
 		prepareForm,
+		fileToBase64,
+		fileToBlob,
 	};
 }

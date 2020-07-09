@@ -1,6 +1,8 @@
 import os
 import io
+import json
 import pandas as pd
+import numpy as np
 import cv2 as cv
 import uvicorn
 from fastapi import FastAPI, File, UploadFile, Form
@@ -35,7 +37,8 @@ async def process_image(image: UploadFile = File(...),
                         quality: float = Form(...),
                         min_area: int = Form(...),
                         max_area: int = Form(...),
-                        max_alpha: int = Form(...)):
+                        max_alpha: int = Form(...),
+                        alphabet: str = Form(...)):
     """Accepts an image and returns a processed version"""
 
     try:
@@ -51,14 +54,26 @@ async def process_image(image: UploadFile = File(...),
 
         # extract the alphabet from the image using the
         # bounding box
-        alphabet_img = None
+        bounding_box = json.loads(alphabet)
+        upper_corner = bounding_box[0]
+        lower_corner = bounding_box[3]
+
+        alphabet_img = src_img[int(upper_corner['y']): int(lower_corner['y']),
+                               int(upper_corner['x']): int(lower_corner['x'])]
 
         # defines the greatest dimension an image can have
-        MAX_IMAGE_SIZE = 1000  # measured in pixels
-        resized_img = resize(src_img, MAX_IMAGE_SIZE)
+        # MAX_IMAGE_SIZE = 1000  # measured in pixels
+        # resized_img = resize(thresh, MAX_IMAGE_SIZE)
+        resized_img = src_img
 
         thresh, alpha_thresh = BasePreprocessor.preprocess(
             resized_img, alphabet_img)
+
+        # remove the alphabet from the preprocessed image
+        alphabet_mask = np.zeros(alphabet_img.shape[:2], dtype='uint8')
+        thresh[int(upper_corner['y']): int(lower_corner['y']),
+               int(upper_corner['x']): int(lower_corner['x'])] = alphabet_mask
+
         pre_labels = BaseLabelDetector.detect(
             thresh, min_area, max_area, resized_img)
         labels = BaseAlphabetDetector.detect(
@@ -76,9 +91,10 @@ async def process_image(image: UploadFile = File(...),
         for contour in state_contour:
             cv.drawContours(mask, [contour], -1, 0, line_thickness)
 
-        no_labels_img = cv.bitwise_and(no_labels, no_labels, mask=mask)
+        no_labels_img = cv.bitwise_and(no_labels_img, no_labels_img, mask=mask)
 
-        _, transitions = BaseTransitionDetector.detect(pre, resized_img)
+        _, transitions = BaseTransitionDetector.detect(
+            no_labels_img, resized_img)
 
         images[image.filename] = {
             'states': states,
@@ -90,6 +106,7 @@ async def process_image(image: UploadFile = File(...),
 
         return StreamingResponse(io.BytesIO(img_encoding.tobytes()), media_type=f'image/{mime_type}')
     except Exception as e:
+        print(e)
         return {'error':  str(e)}
 
 
@@ -106,8 +123,9 @@ def associate_features(image_filename: str):
         root, graph = BaseAssociator.associated(
             img['states'], img['transitions'], img['labels'])
 
-        return {'root': root, 'graph' graph}
+        return {'root': root, 'graph': graph}
     except Exception as e:
+        print(e)
         return {'error': str(e)}
 
 
