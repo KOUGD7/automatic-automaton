@@ -47,6 +47,7 @@ class BaseAssociator(Associator):
                     states_to_remove.append(state_j)
                     set_accepting(state_i)
 
+        # remove inner state (circle) detected in final states
         for state in states_to_remove:
             if state in o_states:
                 o_states.remove(state)
